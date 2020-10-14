@@ -1,3 +1,5 @@
+pub const names = @import("xkbcommon_names.zig");
+
 pub const Keycode = u32;
 
 pub const Keysym = extern enum(u32) {
