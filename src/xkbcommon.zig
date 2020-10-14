@@ -1,4 +1,5 @@
 pub const names = @import("xkbcommon_names.zig");
+pub const keysyms = @import("xkbcommon_keysyms.zig");
 
 pub const Keycode = u32;
 
