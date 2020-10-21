@@ -1,37 +1,8 @@
 pub const names = @import("xkbcommon_names.zig");
-pub const keysyms = @import("xkbcommon_keysyms.zig");
 
 pub const Keycode = u32;
 
-pub const Keysym = extern enum(u32) {
-    _,
-
-    pub const Flags = extern enum {
-        no_flags = 0,
-        case_insensitive = 1 << 0,
-    };
-
-    extern fn xkb_keysym_get_name(keysym: Keysym, buffer: [*]u8, size: usize) c_int;
-    pub const getName = xkb_keysym_get_name;
-
-    extern fn xkb_keysym_from_name(name: [*:0]const u8, flags: Flags) Keysym;
-    pub const fromName = xkb_keysym_from_name;
-
-    extern fn xkb_keysym_to_utf8(keysym: Keysym, buffer: [*]u8, size: usize) c_int;
-    pub const toUTF8 = xkb_keysym_to_utf8;
-
-    extern fn xkb_keysym_to_utf32(keysym: Keysym) u32;
-    pub const toUTF32 = xkb_keysym_to_utf32;
-
-    extern fn xkb_utf32_to_keysym(ucs: u32) Keysym;
-    pub const fromUTF32 = xkb_utf32_to_keysym;
-
-    extern fn xkb_keysym_to_upper(ks: Keysym) Keysym;
-    pub const toUpper = xkb_keysym_to_upper;
-
-    extern fn xkb_keysym_to_lower(ks: Keysym) Keysym;
-    pub const toLower = xkb_keysym_to_lower;
-};
+pub const Keysym = @import("xkbcommon_keysyms.zig").Keysym;
 
 pub const KeyDirection = extern enum {
     up,
