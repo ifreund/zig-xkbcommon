@@ -194,7 +194,11 @@ pub const Keymap = opaque {
     pub const keyGetModsForLevel = xkb_keymap_key_get_mods_for_level;
 
     extern fn xkb_keymap_key_get_syms_by_level(keymap: *Keymap, key: Keycode, layout: LayoutIndex, level: LevelIndex, syms_out: *?[*]const Keysym) c_int;
-    pub const keyGetSymsByLevel = xkb_keymap_key_get_syms_by_level;
+    pub fn keyGetSymsByLevel(state: *State, key: Keycode, layout: LayoutIndex, level: LevelIndex) []const Keysym {
+        var ptr: ?[*]const Keysym = undefined;
+        const len = xkb_keymap_key_get_syms_by_level(state, key, &ptr);
+        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(usize, len)];
+    }
 
     extern fn xkb_keymap_key_repeats(keymap: *Keymap, key: Keycode) c_int;
     pub const keyRepeats = xkb_keymap_key_repeats;
@@ -253,7 +257,11 @@ pub const State = opaque {
     pub const updateMask = xkb_state_update_mask;
 
     extern fn xkb_state_key_get_syms(state: *State, key: Keycode, syms_out: *?[*]const Keysym) c_int;
-    pub const keyGetSyms = xkb_state_key_get_syms;
+    pub fn keyGetSyms(state: *State, key: Keycode) []const Keysym {
+        var ptr: ?[*]const Keysym = undefined;
+        const len = xkb_state_key_get_syms(state, key, &ptr);
+        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(usize, len)];
+    }
 
     extern fn xkb_state_key_get_utf8(state: *State, key: Keycode, buffer: [*]u8, size: usize) c_int;
     pub const keyGetUtf8 = xkb_state_key_get_utf8;
