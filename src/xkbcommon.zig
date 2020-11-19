@@ -194,9 +194,9 @@ pub const Keymap = opaque {
     pub const keyGetModsForLevel = xkb_keymap_key_get_mods_for_level;
 
     extern fn xkb_keymap_key_get_syms_by_level(keymap: *Keymap, key: Keycode, layout: LayoutIndex, level: LevelIndex, syms_out: *?[*]const Keysym) c_int;
-    pub fn keyGetSymsByLevel(state: *State, key: Keycode, layout: LayoutIndex, level: LevelIndex) []const Keysym {
+    pub fn keyGetSymsByLevel(keymap: *Keymap, key: Keycode, layout: LayoutIndex, level: LevelIndex) []const Keysym {
         var ptr: ?[*]const Keysym = undefined;
-        const len = xkb_keymap_key_get_syms_by_level(state, key, &ptr);
+        const len = xkb_keymap_key_get_syms_by_level(keymap, key, layout, level, &ptr);
         return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(usize, len)];
     }
 
