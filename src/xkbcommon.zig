@@ -210,7 +210,7 @@ pub const ConsumedMode = extern enum {
 };
 
 pub const State = opaque {
-    pub const Component = extern enum {
+    pub const Component = extern enum(c_int) {
         _,
         pub const mods_depressed = 1 << 0;
         pub const mods_latched = 1 << 1;
@@ -223,7 +223,7 @@ pub const State = opaque {
         pub const leds = 1 << 8;
     };
 
-    pub const Match = extern enum {
+    pub const Match = extern enum(c_int) {
         _,
         pub const any = 1 << 0;
         pub const all = 1 << 1;
@@ -323,3 +323,23 @@ pub const State = opaque {
     extern fn xkb_state_led_index_is_active(state: *State, idx: LED_Index) c_int;
     pub const ledIndexIsActive = xkb_state_led_index_is_active;
 };
+
+fn refAllDeclsRecursive(comptime T: type) void {
+    const decls = switch (@typeInfo(T)) {
+        .Struct => |info| info.decls,
+        .Union => |info| info.decls,
+        .Enum => |info| info.decls,
+        .Opaque => |info| info.decls,
+        else => return,
+    };
+    inline for (decls) |decl| {
+        switch (decl.data) {
+            .Type => |T2| refAllDeclsRecursive(T2),
+            else => _ = decl,
+        }
+    }
+}
+
+test "" {
+    refAllDeclsRecursive(@This());
+}
