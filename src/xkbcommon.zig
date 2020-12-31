@@ -142,7 +142,7 @@ pub const Keymap = opaque {
         iter: fn (keymap: *Keymap, key: Keycode, data: ?*c_void) callconv(.C) void,
         data: ?*c_void,
     ) void;
-    pub fn keyForEach(
+    pub inline fn keyForEach(
         keymap: *Keymap,
         comptime T: type,
         iter: fn (keymap: *Keymap, key: Keycode, data: T) callconv(.C) void,
