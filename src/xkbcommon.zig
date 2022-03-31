@@ -148,7 +148,12 @@ pub const Keymap = opaque {
         iter: fn (keymap: *Keymap, key: Keycode, data: T) callconv(.C) void,
         data: T,
     ) void {
-        xkb_keymap_key_for_each(keymap, iter, data);
+        xkb_keymap_key_for_each(
+            keymap,
+            // TODO Remove when the zig compiler gets smart enough to handle this coercion.
+            @ptrCast(fn (keymap: *Keymap, key: Keycode, data: ?*anyopaque) callconv(.C) void, iter),
+            data,
+        );
     }
 
     extern fn xkb_keymap_key_get_name(keymap: *Keymap, key: Keycode) ?[*:0]const u8;
