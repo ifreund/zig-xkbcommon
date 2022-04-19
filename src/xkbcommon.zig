@@ -269,7 +269,9 @@ pub const State = opaque {
     }
 
     extern fn xkb_state_key_get_utf8(state: *State, key: Keycode, buffer: [*]u8, size: usize) c_int;
-    pub const keyGetUtf8 = xkb_state_key_get_utf8;
+    pub fn keyGetUtf8(state: *State, key: Keycode, buffer: []u8) usize {
+        return @intCast(usize, xkb_state_key_get_utf8(state, key, buffer.ptr, buffer.len));
+    }
 
     extern fn xkb_state_key_get_utf32(state: *State, key: Keycode) u32;
     pub const keyGetUtf32 = xkb_state_key_get_utf32;
