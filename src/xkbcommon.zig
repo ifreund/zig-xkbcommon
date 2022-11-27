@@ -145,13 +145,16 @@ pub const Keymap = opaque {
     pub inline fn keyForEach(
         keymap: *Keymap,
         comptime T: type,
-        iter: fn (keymap: *Keymap, key: Keycode, data: T) callconv(.C) void,
+        comptime iter: fn (keymap: *Keymap, key: Keycode, data: T) void,
         data: T,
     ) void {
         xkb_keymap_key_for_each(
             keymap,
-            // TODO Remove when the zig compiler gets smart enough to handle this coercion.
-            @ptrCast(fn (keymap: *Keymap, key: Keycode, data: ?*anyopaque) callconv(.C) void, iter),
+            struct {
+                fn _wrapper(_keymap: *Keymap, _key: Keycode, _data: ?*anyopaque) callconv(.C) void {
+                    iter(_keymap, _key, @ptrCast(T, @alignCast(@alignOf(T), _data)));
+                }
+            }._wrapper,
             data,
         );
     }
@@ -331,23 +334,8 @@ pub const State = opaque {
     pub const ledIndexIsActive = xkb_state_led_index_is_active;
 };
 
-fn refAllDeclsRecursive(comptime T: type) void {
-    @setEvalBranchQuota(1000000);
-    const decls = switch (@typeInfo(T)) {
-        .Struct => |info| info.decls,
-        .Union => |info| info.decls,
-        .Enum => |info| info.decls,
-        .Opaque => |info| info.decls,
-        else => return,
-    };
-    inline for (decls) |decl| {
-        switch (decl.data) {
-            .Type => |T2| refAllDeclsRecursive(T2),
-            else => _ = decl,
-        }
-    }
-}
-
-test "" {
-    refAllDeclsRecursive(@This());
+test {
+    const std = @import("std");
+    @setEvalBranchQuota(4000);
+    std.testing.refAllDeclsRecursive(@This());
 }
