@@ -152,7 +152,7 @@ pub const Keymap = opaque {
             keymap,
             struct {
                 fn _wrapper(_keymap: *Keymap, _key: Keycode, _data: ?*anyopaque) callconv(.C) void {
-                    iter(_keymap, _key, @ptrCast(T, @alignCast(@alignOf(T), _data)));
+                    iter(_keymap, _key, @ptrCast(@alignCast(_data)));
                 }
             }._wrapper,
             data,
@@ -205,7 +205,7 @@ pub const Keymap = opaque {
     pub fn keyGetSymsByLevel(keymap: *Keymap, key: Keycode, layout: LayoutIndex, level: LevelIndex) []const Keysym {
         var ptr: ?[*]const Keysym = undefined;
         const len = xkb_keymap_key_get_syms_by_level(keymap, key, layout, level, &ptr);
-        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(usize, len)];
+        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(len)];
     }
 
     extern fn xkb_keymap_key_repeats(keymap: *Keymap, key: Keycode) c_int;
@@ -268,12 +268,12 @@ pub const State = opaque {
     pub fn keyGetSyms(state: *State, key: Keycode) []const Keysym {
         var ptr: ?[*]const Keysym = undefined;
         const len = xkb_state_key_get_syms(state, key, &ptr);
-        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(usize, len)];
+        return if (len == 0) &[0]Keysym{} else ptr.?[0..@intCast(len)];
     }
 
     extern fn xkb_state_key_get_utf8(state: *State, key: Keycode, buffer: [*]u8, size: usize) c_int;
     pub fn keyGetUtf8(state: *State, key: Keycode, buffer: []u8) usize {
-        return @intCast(usize, xkb_state_key_get_utf8(state, key, buffer.ptr, buffer.len));
+        return @intCast(xkb_state_key_get_utf8(state, key, buffer.ptr, buffer.len));
     }
 
     extern fn xkb_state_key_get_utf32(state: *State, key: Keycode) u32;
