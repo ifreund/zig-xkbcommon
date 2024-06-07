@@ -1,6 +1,6 @@
 # zig-xkbcommon
 
-[zig](https://ziglang.org/) 0.12 bindings for
+[zig](https://ziglang.org/) 0.13 bindings for
 [xkbcommon](https://xkbcommon.org) that are a little
 nicer to use than the output of `zig translate-c`.
 
