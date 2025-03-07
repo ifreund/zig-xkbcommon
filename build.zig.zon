@@ -1,7 +1,7 @@
 .{
-    .name = "zig-xkbcommon",
+    .name = .xkbcommon,
     .version = "0.3.0-dev",
-    .minimum_zig_version = "0.13.0",
+    .minimum_zig_version = "0.14.0",
     .paths = .{
         "build.zig",
         "build.zig.zon",
@@ -9,4 +9,5 @@
         "LICENSE",
     },
     .dependencies = .{},
+    .fingerprint = 0x68f445b07b883a54,
 }
