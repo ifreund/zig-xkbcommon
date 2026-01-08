@@ -100,6 +100,51 @@ pub const Context = opaque {
     //extern fn xkb_context_set_log_fn(context: *Context, log_fn: ?fn (?*Context, enum_xkb_log_level, [*c]const u8, [*c]struct___va_list_tag) callconv(.C) void) void;
 };
 
+pub const RmlvoBuilder = opaque {
+    pub const Flags = enum(c_int) {
+        no_flags = 0,
+    };
+
+    extern fn xkb_rmlvo_builder_new(
+        context: *Context,
+        rules: ?[*:0]const u8,
+        model: ?[*:0]const u8,
+        flags: Flags,
+    ) ?*RmlvoBuilder;
+    pub const new = xkb_rmlvo_builder_new;
+
+    extern fn xkb_rmlvo_builder_append_layout(
+        rmlvo: *RmlvoBuilder,
+        layout: [*:0]const u8,
+        variant: ?[*:0]const u8,
+        options: ?[*]const [*:0]const u8,
+        options_len: usize,
+    ) bool;
+    pub fn appendLayout(
+        rmlvo: *RmlvoBuilder,
+        layout: [*:0]const u8,
+        variant: ?[*:0]const u8,
+        options: []const [*:0]const u8,
+    ) bool {
+        return xkb_rmlvo_builder_append_layout(
+            rmlvo,
+            layout,
+            variant,
+            if (options.len == 0) null else options.ptr,
+            options.len,
+        );
+    }
+
+    extern fn xkb_rmlvo_builder_append_option(rmlvo: *RmlvoBuilder, option: [*:0]const u8) bool;
+    pub const appendOption = xkb_rmlvo_builder_append_option;
+
+    extern fn xkb_rmlvo_builder_ref(rmlvo: *RmlvoBuilder) *RmlvoBuilder;
+    pub const ref = xkb_rmlvo_builder_ref;
+
+    extern fn xkb_rmlvo_builder_unref(rmlvo: *RmlvoBuilder) void;
+    pub const unref = xkb_rmlvo_builder_unref;
+};
+
 pub const Keymap = opaque {
     pub const CompileFlags = enum(c_int) {
         no_flags = 0,
@@ -107,9 +152,14 @@ pub const Keymap = opaque {
 
     pub const Format = enum(c_int) {
         text_v1 = 1,
+        text_v2 = 2,
     };
 
+    extern fn xkb_keymap_new_from_rmlvo(rmlvo: *const RmlvoBuilder, format: Format, flags: CompileFlags) ?*Keymap;
+    pub const newFromRmlvo = xkb_keymap_new_from_rmlvo;
+
     extern fn xkb_keymap_new_from_names(context: *Context, names: ?*const RuleNames, flags: CompileFlags) ?*Keymap;
+    /// Deprecated
     pub const newFromNames = xkb_keymap_new_from_names;
 
     // TODO
@@ -252,6 +302,19 @@ pub const State = opaque {
 
     extern fn xkb_state_update_key(state: *State, key: Keycode, direction: KeyDirection) Component;
     pub const updateKey = xkb_state_update_key;
+
+    extern fn xkb_state_update_latched_locked(
+        state: *State,
+        affect_latched_mods: ModMask,
+        latched_mods: ModMask,
+        affect_latched_layout: bool,
+        latched_layout: i32,
+        affect_locked_mods: ModMask,
+        locked_mods: ModMask,
+        affect_locked_layout: bool,
+        locked_layout: i32,
+    ) Component;
+    pub const updateLatchedLocked = xkb_state_update_latched_locked;
 
     extern fn xkb_state_update_mask(
         state: *State,
