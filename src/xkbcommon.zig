@@ -245,6 +245,9 @@ pub const Keymap = opaque {
     extern fn xkb_keymap_mod_get_index(keymap: *Keymap, name: [*:0]const u8) ModIndex;
     pub const modGetIndex = xkb_keymap_mod_get_index;
 
+    extern fn xkb_keymap_mod_get_mask(keymap: *Keymap, name: [*:0]const u8) ModMask;
+    pub const modGetMask = xkb_keymap_mod_get_mask;
+
     extern fn xkb_keymap_num_layouts(keymap: *Keymap) LayoutIndex;
     pub const numLayouts = xkb_keymap_num_layouts;
 
