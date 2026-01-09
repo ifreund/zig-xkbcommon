@@ -153,7 +153,21 @@ pub const Keymap = opaque {
     pub const Format = enum(c_int) {
         text_v1 = 1,
         text_v2 = 2,
+
+        /// Only vaild for getAsString2()
+        use_original_format = -1,
     };
+
+    pub const SerializeFlags = packed struct(c_int) {
+        pretty: bool = false,
+        keep_unused: bool = false,
+        _: u30 = 0,
+    };
+
+    pub const XKB_KEYMAP_SERIALIZE_NO_FLAGS: c_int = 0;
+    pub const XKB_KEYMAP_SERIALIZE_PRETTY: c_int = 1;
+    pub const XKB_KEYMAP_SERIALIZE_KEEP_UNUSED: c_int = 2;
+    pub const enum_xkb_keymap_serialize_flags = c_uint;
 
     extern fn xkb_keymap_new_from_rmlvo(rmlvo: *const RmlvoBuilder, format: Format, flags: CompileFlags) ?*Keymap;
     pub const newFromRmlvo = xkb_keymap_new_from_rmlvo;
@@ -161,6 +175,10 @@ pub const Keymap = opaque {
     extern fn xkb_keymap_new_from_names(context: *Context, names: ?*const RuleNames, flags: CompileFlags) ?*Keymap;
     /// Deprecated
     pub const newFromNames = xkb_keymap_new_from_names;
+
+    extern fn xkb_keymap_new_from_names2(context: *Context, names: ?*const RuleNames, format: Format, flags: CompileFlags) ?*Keymap;
+    /// Deprecated
+    pub const newFromNames2 = xkb_keymap_new_from_names2;
 
     // TODO
     //extern fn xkb_keymap_new_from_file(context: *Context, file: *FILE, format: Format, flags: CompileFlags) ?*Keymap;
@@ -178,8 +196,11 @@ pub const Keymap = opaque {
     extern fn xkb_keymap_unref(keymap: *Keymap) void;
     pub const unref = xkb_keymap_unref;
 
-    extern fn xkb_keymap_get_as_string(keymap: *Keymap, format: Format) [*c]u8;
+    extern fn xkb_keymap_get_as_string(keymap: *Keymap, format: Format) ?[*:0]u8;
     pub const getAsString = xkb_keymap_get_as_string;
+
+    extern fn xkb_keymap_get_as_string2(keymap: *Keymap, format: Format, flags: SerializeFlags) ?[*:0]u8;
+    pub const getAsString2 = xkb_keymap_get_as_string2;
 
     extern fn xkb_keymap_min_keycode(keymap: *Keymap) Keycode;
     pub const minKeycode = xkb_keymap_min_keycode;
