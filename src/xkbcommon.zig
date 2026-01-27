@@ -154,7 +154,7 @@ pub const Keymap = opaque {
         text_v1 = 1,
         text_v2 = 2,
 
-        /// Only vaild for getAsString2()
+        /// May be passed to getAsString() and getAsString2()
         use_original_format = -1,
     };
 
