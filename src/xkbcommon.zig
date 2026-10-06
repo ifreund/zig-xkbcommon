@@ -422,7 +422,19 @@ pub const State = opaque {
 };
 
 test {
-    const std = @import("std");
     @setEvalBranchQuota(4000);
-    std.testing.refAllDeclsRecursive(@This());
+    refAllDeclsRecursive(@This());
+}
+
+fn refAllDeclsRecursive(comptime T: type) void {
+    const std = @import("std");
+    inline for (comptime std.meta.declarations(T)) |decl| {
+        if (@TypeOf(@field(T, decl)) == type) {
+            switch (@typeInfo(@field(T, decl))) {
+                .@"struct", .@"enum", .@"union", .@"opaque" => refAllDeclsRecursive(@field(T, decl)),
+                else => {},
+            }
+        }
+        _ = &@field(T, decl);
+    }
 }
